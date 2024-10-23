@@ -1,58 +1,119 @@
 {% include install_instructions/r.html %}
 
+<p>
+After installing R and RStudio, start RStudio.
+</p>
+    
+<h3>R packages</h3>
+  <p>
+    The <a href="https://kbroman.org/qtl2/">qtl2</a> package contains code for haplotype reconstruction, QTL mapping and plotting.
+    The <a href="https://github.com/rqtl/qtl2convert">qtl2convert</a> package contains code for converting data objects from one format to another.  
+    Install all required packages by copying and pasting the following code into the R console. 
+  </p>
 
-<h3>qtl2</h3>
+<code>
+install.packages(c("tidyverse", "ggbeeswarm", "qtl2", "qtl2convert"))
+</code>
 
-The [qtl2](https://github.com/rqtl/qtl2) package contains code for haplotype
-reconstruction, QTL mapping and plotting.
+<p>
+</p>
+<p>
+Once the installation is complete, load the libraries to make sure that they installed correctly.  
+</p>
 
-Install R/qtl2 from [https://cran.r-project.org/](CRAN):
+<p><code>library(tidyverse)</code></p>
+<p><code>library(ggbeeswarm)</code></p>
+<p><code>library(qtl2)</code></p>
+<p><code>library(qtl2convert)</code></p>
 
-~~~
-install.packages("qtl2")
-~~~
-{: .r}
+<p>
+If the libraries don't load and you received errors during the installation, please contact the workshop instructors before the workshop to help you.  
+</p>
 
-### Data files and project organization
+<h3>Project organization</h3>
 
-1. Make a new folder in your Desktop called `mapping`. Move into this new folder.
+<ol>
+<li>Create a new project in your Desktop called <code>qtl_mapping</code>.</li>
+    <ul>
+        <li>Click the <code>File</code> menu button, then <code>New Project</code>.</li>
+        <li>Click <code>New Directory</code>.</li>
+        <li>Click <code>New Project</code>.</li>
+        <li>Type <code>qtl_mapping</code> as the directory name. Browse to your Desktop to create the project there.</li>
+        <li>Click the <code>Create Project</code> button.</li>
+    </ul>
 
-2. Create  a `data` folder to hold the data, a `scripts` folder to house your scripts, and
-a `results` folder to hold results.
+<li>Use the <code>Files</code> tab to create  a <code>data</code> folder to hold the data, a <code>scripts</code> folder to house your scripts, and a <code>results</code> folder to hold results.</li> 
 
-Alternatively, you can use the R console to run the following commands for steps 1 and 2.
+<p>Alternatively, you can use the  R console to run the following commands for step 2 only. You still need to create a  project with step 1.</p>
 
-~~~
-setwd("~/Desktop")
-dir.create("./mapping")
-setwd("~/Desktop/mapping")
-dir.create("./data")
-dir.create("./scripts")
-dir.create("./results")
-~~~
-{: .r}
+<p><code>dir.create("./data")</code></p>
+<p><code>dir.create("./scripts")</code></p>
+<p><code>dir.create("./results")</code></p>
 
-3. Please download the following large files **before the workshop**, and place them in
-your `data` folder. You can download the files from the URLs below and move the files the
-same way that you would for downloading and moving any other kind of data.
+</ol>
 
-- [cc_variants.sqlite doi:10.6084/m9.figshare.5280229.v2](https://figshare.com/articles/SQLite_database_of_variants_in_Collaborative_Cross_founder_mouse_strains/5280229/2), variants in the Collaborative Cross founders (3 GB)
-- [mouse_genes.sqlite doi:10.6084/m9.figshare.5280238.v4](https://figshare.com/articles/SQLite_database_with_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5280238/4) full set of mouse gene annotations (677 MB)
-- [mouse_genes_mgi.sqlite doi:10.6084/m9.figshare.5286019.v5](https://figshare.com/articles/SQLite_database_with_MGI_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5286019/5) just the MGI mouse gene annotations (11 MB)
-- [DO QTL data](ftp://ftp.jax.org/dgatti/qtl2_workshop/qtl2_demo.Rdata) Dan's DO data from the benzene study
+<h3>Data Sets</h3>
 
-Alternatively, you can copy and paste the following into the R console to download the
-data.
+<p>
+For this course, we will have several data files which you will need to download to the <code>data</code> directory in the project folder on your Desktop.
+Copy, paste, and run the following code in the RStudio console.  
+</p>
+    
+<p>The first file contains the data that we will use for QTL mapping in an F2 population.</p> 
 
-~~~
-setwd("~/Desktop/mapping")
-download.file("https://ndownloader.figshare.com/files/9746485", "./data/cc_variants.sqlite")
-download.file("https://ndownloader.figshare.com/files/9746458", "./data/mouse_genes.sqlite")
-download.file("https://ndownloader.figshare.com/files/9746452", "./data/mouse_genes_mgi.sqlite")
-download.file("ftp://ftp.jax.org/dgatti/qtl2_workshop/qtl2_demo.Rdata", "./data/qtl2_demo.Rdata")
-~~~
-{: .r}
+<code>
+download.file(url      = "https://thejacksonlaboratory.box.com/shared/static/svw7ivp5hhmd7vb8fy26tc53h7r85wez.zip",
+              destfile = "data/attie_b6btbr_grcm39.Rdata",
+              mode     = "wb")
+</code>
+
+<p>
+</p>
+<p>The second file contains the Diversity Outbred mapping data.</p> 
+
+<code>
+download.file(url      = "https://thejacksonlaboratory.box.com/shared/static/wspizp2jgrtngvvw5ixredpu7627mh5w.rdata",
+              destfile = "data/qtl2_demo_grcm39.Rdata",
+              mode     = "wb")
+</code>
+
+<p>
+</p>
+<p>Next, download the MUGA marker positions from Karl Broman's Github page.</p> 
+
+<code>
+download.file(url      = "https://raw.githubusercontent.com/kbroman/MUGAarrays/main/UWisc/muga_uwisc_v4.csv",
+              destfile = "data/muga_uwisc_v4.csv",
+              mode     = "wb")
+</code>
+
+<p>
+</p>
+<p>Next, we need a database of the DO founder SNPs and gene positions. This file is 10 GB, so it will take a while to download.</p> 
+
+<code>
+download.file(url      = "https://figshare.com/ndownloader/files/40157572",
+              destfile = "data/fv.2021.snps.db3",
+              mode     = "wb")
+</code>
+
+<p>
+</p>
+<p>
+Please download the following large files <strong>before the workshop</strong>, and place them in your <code>data</code> folder. You can download the files from the URLs below and move the files the same way that you would for downloading and moving any other kind of data.
+</p>  
 
 
-You will need these for the final lesson episodes on SNP association mapping and QTL
-analysis in Diversity Outbred mice.
+[cc_variants.sqlite doi:10.6084/m9.figshare.5280229.v2](https://figshare.com/articles/SQLite_database_of_variants_in_Collaborative_Cross_founder_mouse_strains/5280229/2), variants in the Collaborative Cross founders (3 GB)
+[mouse_genes.sqlite doi:10.6084/m9.figshare.5280238.v4](https://figshare.com/articles/SQLite_database_with_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5280238/4) full set of mouse gene annotations (677 MB)
+[mouse_genes_mgi.sqlite doi:10.6084/m9.figshare.5286019.v5](https://figshare.com/articles/SQLite_database_with_MGI_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5286019/5) just the MGI mouse gene annotations (11 MB)
+
+    
+<p>
+Alternatively, you can copy and paste the following into the R console to download the data.
+</p> 
+
+<p><code>setwd("~/Desktop/mapping")</code></p>
+<p><code>download.file("https://ndownloader.figshare.com/files/9746485", "./data/cc_variants.sqlite")</code></p>
+<p><code>download.file("https://ndownloader.figshare.com/files/9746458", "./data/mouse_genes.sqlite")</code></p>
+<p><code>download.file("https://ndownloader.figshare.com/files/9746452", "./data/mouse_genes_mgi.sqlite")</code></p>
