@@ -6,13 +6,20 @@ After installing R and RStudio, start RStudio.
     
 <h3>R packages</h3>
   <p>
-    The <a href="https://kbroman.org/qtl2/">qtl2</a> package contains code for haplotype reconstruction, QTL mapping and plotting.
-    The <a href="https://github.com/rqtl/qtl2convert">qtl2convert</a> package contains code for converting data objects from one format to another.  
     Install all required packages by copying and pasting the following code into the R console. 
   </p>
 
 <code>
-install.packages(c("tidyverse", "ggbeeswarm", "qtl2", "qtl2convert"))
+<p>install.packages(c("tidyverse", "ggbeeswarm", "knitr", "qtl2", "remotes"))</p>
+
+<p>if (!require("BiocManager", quietly = TRUE))</p>
+    install.packages("BiocManager")
+
+<p>BiocManager::install("AnnotationHub")</p>
+<p>BiocManager::install("DeSeq2")</p>
+<p>BiocManager::install("rtracklayer")</p>
+
+<p>remotes::install_github("StoreyLab/qvalue")</p>
 </code>
 
 <p>
@@ -23,11 +30,15 @@ Once the installation is complete, load the libraries to make sure that they ins
 
 <p><code>library(tidyverse)</code></p>
 <p><code>library(ggbeeswarm)</code></p>
+<p><code>library(knitr)</code></p>
+<p><code>library(qvalue)</code></p>
 <p><code>library(qtl2)</code></p>
-<p><code>library(qtl2convert)</code></p>
+<p><code>library(AnnotationHub)</code></p>
+<p><code>library(DESeq2)</code></p>
+<p><code>library(rtracklayer)</code></p>
 
 <p>
-If the libraries don't load and you received errors during the installation, please contact the workshop instructors before the workshop to help you.  
+If the libraries don't load and you received errors during the installation, please contact the instructors before the workshop to help you.  
 </p>
 
 <h3>Project organization</h3>
@@ -55,65 +66,30 @@ If the libraries don't load and you received errors during the installation, ple
 <h3>Data Sets</h3>
 
 <p>
-For this course, we will have several data files which you will need to download to the <code>data</code> directory in the project folder on your Desktop.
-Copy, paste, and run the following code in the RStudio console.  
+For this course, we will have several data files which you will need to download to the <code>data</code> directory in the project folder on your Desktop. Download files from the 
+<a href="https://github.com/smcclatchy/eqtl-mapping/tree/main/episodes/data">Github lesson repository</a>.
+You will need to download them one by one using the direct links below. For each file, locate the download button at upper right. Repeat this process for each file. Then move the files from wherever your downloads go (e.g. <code>Downloads</code>) to the <code>data</code> directory in the <code>eqtl_mapping</code> project. You can use a graphical user interface (e.g. Windows File Explorer, Mac Finder) to move the files.
 </p>
-    
-<p>The first file contains the data that we will use for eQTL mapping in an F2 population.</p> 
+
+<p>
+1. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_pheno.rds">physiological phenotypes</a></p>
+2. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_pheno_dict.rds">phenotype dictionary</a></p>
+3. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_covar.rds">covariates</a></p>
+4. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_expr_annot.rds">gene annotations</a></p>
+5. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_expr_raw.rds">raw gene expression</a></p>
+6. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_map.rds">map</a></p>
+7. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/attie_do_kinship.rds">kinship</a></p>
+8. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/ins_tauc_blup_chr11.rds">chromosome 11 insulin blups</a></p>
+9. <p><a href="https://github.com/smcclatchy/eqtl-mapping/blob/main/episodes/data/hnf1b_blup_chr11.rds">chromosome 11 Hnf1b blups</a></p>
+</p>
+
+
+<p>
+Copy, paste, and run the following code in the RStudio console to download the genotype probabilities for the gene expression study we will explore in this lesson.
+</p>
 
 <code>
-download.file(url      = "https://thejacksonlaboratory.box.com/shared/static/svw7ivp5hhmd7vb8fy26tc53h7r85wez.zip",
-              destfile = "data/attie_b6btbr_grcm39.Rdata",
+download.file(url      = "https://thejacksonlaboratory.box.com/shared/static/4hy4hbjyrxjbrzh570i4g02r62bx3lgk.rds",
+              destfile = "data/attie_DO500_genoprobs_v5.rds",
               mode     = "wb")
 </code>
-
-<p>
-</p>
-<p>The second file contains the Diversity Outbred mapping data.</p> 
-
-<code>
-download.file(url      = "https://thejacksonlaboratory.box.com/shared/static/wspizp2jgrtngvvw5ixredpu7627mh5w.rdata",
-              destfile = "data/qtl2_demo_grcm39.Rdata",
-              mode     = "wb")
-</code>
-
-<p>
-</p>
-<p>Next, download the MUGA marker positions from Karl Broman's Github page.</p> 
-
-<code>
-download.file(url      = "https://raw.githubusercontent.com/kbroman/MUGAarrays/main/UWisc/muga_uwisc_v4.csv",
-              destfile = "data/muga_uwisc_v4.csv",
-              mode     = "wb")
-</code>
-
-<p>
-</p>
-<p>Next, we need a database of the DO founder SNPs and gene positions. This file is 10 GB, so it will take a while to download.</p> 
-
-<code>
-download.file(url      = "https://figshare.com/ndownloader/files/40157572",
-              destfile = "data/fv.2021.snps.db3",
-              mode     = "wb")
-</code>
-
-<p>
-</p>
-<p>
-Please download the following large files <strong>before the workshop</strong>, and place them in your <code>data</code> folder. You can download the files from the URLs below and move the files the same way that you would for downloading and moving any other kind of data.
-</p>  
-
-
-[cc_variants.sqlite doi:10.6084/m9.figshare.5280229.v2](https://figshare.com/articles/SQLite_database_of_variants_in_Collaborative_Cross_founder_mouse_strains/5280229/2), variants in the Collaborative Cross founders (3 GB)
-[mouse_genes.sqlite doi:10.6084/m9.figshare.5280238.v4](https://figshare.com/articles/SQLite_database_with_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5280238/4) full set of mouse gene annotations (677 MB)
-[mouse_genes_mgi.sqlite doi:10.6084/m9.figshare.5286019.v5](https://figshare.com/articles/SQLite_database_with_MGI_mouse_gene_annotations_from_Mouse_Genome_Informatics_MGI_at_The_Jackson_Laboratory/5286019/5) just the MGI mouse gene annotations (11 MB)
-
-    
-<p>
-Alternatively, you can copy and paste the following into the R console to download the data.
-</p> 
-
-<p><code>setwd("~/Desktop/eqtl_mapping")</code></p>
-<p><code>download.file("https://ndownloader.figshare.com/files/9746485", "./data/cc_variants.sqlite")</code></p>
-<p><code>download.file("https://ndownloader.figshare.com/files/9746458", "./data/mouse_genes.sqlite")</code></p>
-<p><code>download.file("https://ndownloader.figshare.com/files/9746452", "./data/mouse_genes_mgi.sqlite")</code></p>
